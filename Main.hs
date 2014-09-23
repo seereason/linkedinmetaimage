@@ -25,7 +25,7 @@ import OpenGraph
 
 debugM x y = putStr x >> putStr ":" >> putStrLn y
 
-myport = 8010
+myport = 8011
 
 main :: IO ()
 main = do
@@ -41,20 +41,25 @@ helloWorld = H.div $ do
   H.toMarkup titleString
   H.br
   H.div ! HA.style (H.toValue "width: 100%;") $ do
-    H.img ! HA.src (H.toValue $ show imageURI)  ! HA.width (H.toValue "600px") -- ! HA.height (H.toValue imageHeight) ! HA.width (H.toValue imageWidth)
+--    H.img ! HA.src (H.toValue $ show imageURI)  ! HA.width (H.toValue "600px")
+    H.img ! HA.src (H.toValue $ show image2URI)  ! HA.width (H.toValue "180px")
 
 handlers :: ServerPartT IO Response
 handlers = msum [ rootHandler
-                , imageHandler
+--                , imageHandler
+                , image2Handler
                 , notFound (toResponse ("plain text" ++ ":" ++ "notFound"))
                 ]
 
 domain :: String
-domain = "c-73-51-188-220.hsd1.il.comcast.net"
+domain = "xyzzy.stockwits.com"
+-- domain = "c-73-51-188-220.hsd1.il.comcast.net"
 -- domain = "localhost"
 
 baseURI :: URI
 baseURI = fromJust $ parseURI $ "http://" ++ domain ++ ":" ++ show myport
+
+
 
 imageFullURI :: URI
 imageFullURI = fromJust $ parseURI $ "http://" ++ domain ++ ":" ++ show myport ++ imagePath
@@ -71,21 +76,41 @@ imageWidth, imageHeight :: Int
 imageWidth = 800
 imageHeight = 600
 
-
 imageHandler :: ServerPartT IO Response
 imageHandler = dirs (imagePath) $ serveFile (asContentType "image/jpeg") imageFP
+
+
+
+image2FullURI :: URI
+image2FullURI = fromJust $ parseURI $ "http://" ++ domain ++ ":" ++ show myport ++ image2Path
+
+image2Path =  "/og/image2"
+
+image2URI :: URI
+image2URI = fromJust $ parseRelativeReference image2Path
+
+image2FP :: FilePath
+image2FP = "ogimage2.jpg"
+
+image2Handler :: ServerPartT IO Response
+image2Handler = dirs (image2Path) $ serveFile (asContentType "image/jpeg") image2FP
+
+image2Width, image2Height :: Int
+image2Width = 200
+image2Height = 200
 
 
 descriptionString :: String
 descriptionString = "This site has minimal content, just OpenGraph meta tags."
 
 application = htmlTemplate titleString ogs [helloWorld] 
-  where ogs = [ ogDescription descriptionString
-              , ogImage imageFullURI (imageWidth, imageHeight)  "image/jpeg"
-              , ogTitle titleString
-              , ogType "product"
+  where ogs = [ ogType "website"
               , ogSiteName "TestOpenGraph"
+              , ogTitle titleString
+              , ogDescription descriptionString
               , ogURL baseURI
+--              , ogImage imageFullURI (imageWidth, imageHeight)  "image/jpeg"
+              , ogImage image2FullURI (image2Width, image2Height)  "image/jpeg"
               ]
  
 
