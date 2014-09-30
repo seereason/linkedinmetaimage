@@ -36,9 +36,10 @@ ogURL u = ogMeta ["url"] (show u)
 
 type MimeType = String
 
-ogImage :: URI -> (Int, Int) -> MimeType -> H.Markup
-ogImage u (w,h) mt = do
+ogImage :: URI -> URI -> (Int, Int) -> MimeType -> H.Markup
+ogImage u su (w,h) mt = do
   ogMeta ["image"] (show u)
+  ogMeta ["image","secure_url"] (show su)
   ogMeta ["image","width"] (show w)
   ogMeta ["image","height"] (show h)
   ogMeta ["image","type"] mt
